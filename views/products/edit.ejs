@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update <%=product.id%>
+    </title>
+</head>
+
+<body>
+
+    <form action="/product/<%=product.id%>?_method=PUT" method="post">
+        <label for="name">Name: </label>
+        <input type="text" name="name" id="name" placeholder="name" value=<%=product.name%>>
+        <label for="price">Price: $</label>
+        <input type="text" name="price" id="price" placeholder="price" value=<%=product.price%>>
+        <label for="category">Select a Category:</label>
+        <select name="category" id="category">
+            <% for(let categoryFrom of categories) { %>
+                <option value=<%=`${categoryFrom}` %>
+                    <%=product.category===`${categoryFrom}` ? 'selected' : '' %>><%= `${categoryFrom}` %>
+                </option>
+                <% } %>
+        </select>
+        <button>Update</button>
+    </form>
+
+    <a href="/product/<%=product.id%>">Cancel</a>
+
+</body>
+
+</html>

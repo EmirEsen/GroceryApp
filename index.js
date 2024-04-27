@@ -1,25 +1,68 @@
 const mongoose = require('mongoose');
 const express = require('express');
+var methodOverride = require('method-override')
 const app = express();
 const path = require('path')
 
 const Product = require('./models/product');
 
-
-
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: false }));
+app.use(methodOverride('_method'))
+
+const categories = ['fruit', 'vegetable', 'dairy', 'fungi'];
 
 app.get('/product', async (req, res) => {
-    const products = await Product.find({});
-    res.render('products/index', { products });
+    const { category } = req.query;
+    if (category) {
+        const products = await Product.find({ category });
+        res.render('products/index', { products, category });
+    } else {
+        const products = await Product.find({});
+        res.render('products/index', { products, category: 'All' });
+    }
+
 });
 
 
 app.get('/product/new', (req, res) => {
-    res.render('products/new')
+    res.render('products/new', { categories })
 });
+
+
+app.get('/product/:id/edit', async (req, res) => {
+    const { id } = req.params;
+    const product = await Product.findById(id);
+    res.render('products/edit', { product, categories })
+});
+
+app.put('/product/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const product = await Product.findByIdAndUpdate(id, req.body, { runValidators: true });
+        res.redirect(`/product/${product._id}`);
+    } catch (error) {
+        console.error('Error creating product:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+
+app.delete('/product/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const product = await Product.findById(id)
+        await product.deleteOne(product);
+        res.redirect("/product");
+    } catch (error) {
+        console.error('Error creating product:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+
+
 
 app.post('/product', async (req, res) => {
     try {
@@ -32,7 +75,6 @@ app.post('/product', async (req, res) => {
             price,
             category
         });
-
         // Save the new product to the database
         const product = await newProduct.save();
         res.render('products/show', { product });

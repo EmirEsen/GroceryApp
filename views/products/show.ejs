@@ -13,8 +13,18 @@
     <h1>
         <%= product.name %> - <%= product.price %>
     </h1>
+    <a href="/product?category=<%=product.category%>">
+        <%=product.category%>
+    </a>
 
-    <a href="/product">All Products</a>
+    <div>
+        <a href="/product/<%=product._id%>/edit">Update</a>
+        <form action="/product/<%=product._id%>?_method=DELETE" method="post">
+            <button>Delete</button>
+        </form>
+    </div>
+
+    <a href="/product">Back to All Products</a>
 
 </body>
 
